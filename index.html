@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<title>Nada Pantau</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231D4ED8'/%3E%3Cpath d='M14 46V18h8l20 18V18h8v28h-8L22 28v18z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #EDF1F6; --surface: #FFFFFF; --ink: #0F1B2D; --muted: #566780; --line: #D3DBE6; --soft: #E3E9F2;
+  --brand: #1D4ED8; --brand-ink: #FFFFFF; --ok: #0B8F5F; --warn: #B45309; --bad: #B42318;
+  --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0A111E; --surface: #111B2D; --ink: #E7EDF6; --muted: #9AA9BF; --line: #243249; --soft: #18243A;
+    --brand: #6EA0FF; --brand-ink: #0A111E; --ok: #3DD598; --warn: #F5B454; --bad: #FF8A7A;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--font); font-variant-numeric: tabular-nums; }
+h1, h2, h3, p { margin: 0; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; border-radius: 6px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 16px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+/* tombol & isian */
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 9px 14px; font-weight: 700; min-height: 40px; }
+.btn.utama { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.btn:disabled { opacity: .55; cursor: default; }
+.btn.tautan { border: 0; background: none; padding: 4px 2px; min-height: 0; color: var(--brand); text-decoration: underline; font-weight: 500; }
+.isian { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 10px 12px; min-height: 44px; }
+label.f { display: block; font-weight: 700; margin: 14px 0 6px; }
+.galat { color: var(--bad); font-weight: 500; margin-top: 12px; }
+
+/* masuk */
+#masuk { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+.panel-masuk { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+.merek { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -.01em; }
+.logo { width: 32px; height: 32px; border-radius: 8px; background: var(--brand); display: grid; place-items: center; }
+.logo svg { width: 20px; height: 20px; fill: var(--brand-ink); }
+.panel-masuk h1 { font-size: 22px; font-weight: 800; letter-spacing: -.01em; margin: 22px 0 4px; }
+
+/* kepala */
+.kepala { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0 12px; }
+.kepala .kanan { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.kepala .email { max-width: 38vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* filter */
+.filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 0 4px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 14px; font-weight: 500; min-height: 38px; }
+.chip[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); font-weight: 700; }
+.tgl { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; padding: 8px 0; }
+.tgl label { font-size: 13px; color: var(--muted); display: grid; gap: 4px; }
+.tgl input { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 10px; min-height: 40px; }
+.status { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 6px 0 14px; font-size: 13px; color: var(--muted); }
+.titik { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); margin-right: 6px; vertical-align: baseline; }
+.titik.baik { background: var(--ok); } .titik.lambat { background: var(--warn); } .titik.lama, .titik.kosong { background: var(--bad); }
+
+/* pita ringkasan */
+.pita { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; display: grid; grid-template-columns: 1fr; }
+.pita .utama { padding: 18px 18px 16px; }
+.pita .judul { color: var(--muted); font-weight: 500; }
+.pita .besar { font-size: clamp(2rem, 8vw, 2.9rem); line-height: 1.1; font-weight: 800; letter-spacing: -.03em; margin-top: 4px; overflow-wrap: anywhere; }
+.pita dl { margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line); }
+.pita dl > div { padding: 12px 18px; border-bottom: 1px solid var(--line); }
+.pita dl > div:nth-child(odd) { border-right: 1px solid var(--line); }
+.pita dl > div:nth-last-child(-n+2) { border-bottom: 0; }
+.pita dt { color: var(--muted); font-size: 13px; }
+.pita dd { margin: 2px 0 0; font-weight: 700; font-size: 17px; }
+@media (min-width: 860px) {
+  .pita { grid-template-columns: minmax(280px, 5fr) 7fr; }
+  .pita dl { border-top: 0; border-left: 1px solid var(--line); grid-template-columns: repeat(2, 1fr); align-content: stretch; }
+  .pita dl > div { display: flex; flex-direction: column; justify-content: center; }
+}
+
+/* blok */
+.blok { margin-top: 28px; }
+.blok > h2 { font-size: 17px; font-weight: 800; letter-spacing: -.01em; padding-bottom: 8px; border-bottom: 2px solid var(--ink); display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.blok > h2 span { font-size: 13px; font-weight: 500; color: var(--muted); }
+.dua { display: grid; gap: 0 32px; grid-template-columns: 1fr; }
+@media (min-width: 860px) { .dua { grid-template-columns: 1fr 1fr; } }
+
+/* buku cabang */
+.daftar { list-style: none; margin: 0; padding: 0; }
+.cab { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.cab .nama { font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.cab .nama small { font-weight: 400; color: var(--muted); margin-left: 6px; }
+.cab .angka { font-weight: 800; text-align: right; }
+.cab .sub { color: var(--muted); font-size: 13px; }
+.cab .sub.kanan { text-align: right; }
+.cab .bar { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--soft); margin-top: 8px; overflow: hidden; }
+.cab .bar i { display: block; height: 100%; border-radius: 3px; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; vertical-align: baseline; }
+
+/* grafik */
+.grafik { padding-top: 12px; }
+.grafik svg { width: 100%; height: auto; display: block; }
+.grafik .sumbu { fill: var(--muted); font-size: 11px; font-family: var(--font); }
+.grafik .garis { stroke: var(--line); stroke-width: 1; }
+.grafik .hit { fill: transparent; cursor: pointer; }
+.grafik .hit:hover, .grafik .hit.pilih { fill: var(--soft); }
+.legenda { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; font-size: 13px; color: var(--muted); }
+.rinci-hari { margin-top: 10px; padding: 10px 12px; background: var(--soft); border-radius: 8px; font-size: 14px; }
+.rinci-hari b { font-weight: 700; }
+
+/* batang mendatar */
+.bm { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.bm .baris { display: flex; justify-content: space-between; gap: 12px; }
+.bm .baris b { font-weight: 700; overflow-wrap: anywhere; }
+.bm .bar { height: 6px; border-radius: 3px; background: var(--soft); margin-top: 6px; overflow: hidden; }
+.bm .bar i { display: block; height: 100%; background: var(--brand); border-radius: 3px; }
+
+.kosong { padding: 18px 0; color: var(--muted); }
+.peringatan { margin-top: 14px; padding: 12px 14px; border: 1px solid var(--warn); border-radius: 8px; }
+.peringatan b { display: block; margin-bottom: 4px; }
+.catatan { margin: 32px 0 24px; color: var(--muted); font-size: 13px; }
+@media (prefers-reduced-motion: no-preference) { .chip, .btn { transition: background-color .12s, border-color .12s; } }
+</style>
+</head>
+<body>
+
+<noscript><div class="wrap"><p class="galat">Dashboard membutuhkan JavaScript. Aktifkan JavaScript di browser lalu muat ulang halaman.</p></div></noscript>
+
+<main id="masuk" hidden>
+  <div class="panel-masuk">
+    <div class="merek"><span class="logo" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M14 46V18h8l20 18V18h8v28h-8L22 28v18z"/></svg></span>Nada Pantau</div>
+    <h1>Masuk sebagai admin</h1>
+    <p class="muted">Pantau penjualan semua cabang dari satu tempat.</p>
+    <form id="formMasuk" novalidate>
+      <label class="f" for="email">Email</label>
+      <input class="isian" id="email" type="email" autocomplete="username" inputmode="email" required>
+      <label class="f" for="sandi">Password</label>
+      <input class="isian" id="sandi" type="password" autocomplete="current-password" required>
+      <p class="galat" id="galatMasuk" role="alert" hidden></p>
+      <button class="btn utama" id="tombolMasuk" type="submit" style="width:100%;margin-top:18px">Masuk</button>
+    </form>
+  </div>
+</main>
+
+<div id="app" class="wrap" hidden>
+  <header class="kepala">
+    <div class="merek"><span class="logo" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M14 46V18h8l20 18V18h8v28h-8L22 28v18z"/></svg></span>Nada Pantau</div>
+    <div class="kanan">
+      <span class="muted small email" id="emailPengguna"></span>
+      <button class="btn" id="tombolKeluar" type="button">Keluar</button>
+    </div>
+  </header>
+
+  <div class="filter" role="group" aria-label="Rentang tanggal">
+    <button class="chip" type="button" data-preset="hari-ini" aria-pressed="true">Hari ini</button>
+    <button class="chip" type="button" data-preset="kemarin" aria-pressed="false">Kemarin</button>
+    <button class="chip" type="button" data-preset="7-hari" aria-pressed="false">7 hari</button>
+    <button class="chip" type="button" data-preset="bulan-ini" aria-pressed="false">Bulan ini</button>
+    <button class="chip" type="button" data-preset="bulan-lalu" aria-pressed="false">Bulan lalu</button>
+    <button class="chip" type="button" data-preset="kustom" aria-pressed="false">Pilih tanggal</button>
+  </div>
+  <form class="tgl" id="formTanggal" hidden>
+    <label>Dari<input type="date" id="tglDari"></label>
+    <label>Sampai<input type="date" id="tglSampai"></label>
+    <button class="btn utama" type="submit">Terapkan</button>
+    <span class="galat" id="galatTanggal" role="alert" style="margin:0" hidden></span>
+  </form>
+  <div class="status" aria-live="polite">
+    <span><i class="titik" id="titikSambung"></i><span id="teksSambung">Menyambung…</span></span>
+    <span id="teksRentang"></span>
+    <button class="btn tautan" id="tombolCsv" type="button">Unduh CSV</button>
+  </div>
+
+  <div id="panelAkses" class="peringatan" hidden>
+    <b>Akun ini belum bisa membaca data toko</b>
+    <p class="small">Masuk dengan akun pemilik toko. Jika Anda admin tambahan, masukkan Kode Toko dari pemilik, lalu pastikan akun Anda terdaftar sebagai ADMIN di Firebase.</p>
+    <form id="formToko" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap" novalidate>
+      <input class="isian" id="inputToko" style="flex:1;min-width:220px" placeholder="Kode Toko" aria-label="Kode Toko" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button class="btn utama" type="submit">Pakai kode ini</button>
+    </form>
+    <p class="galat" id="galatToko" role="alert" hidden></p>
+  </div>
+
+  <section class="pita" id="pita" aria-label="Ringkasan"></section>
+
+  <section class="blok" aria-labelledby="hCab">
+    <h2 id="hCab">Cabang <span id="infoCab"></span></h2>
+    <ul class="daftar" id="daftarCab"></ul>
+  </section>
+
+  <section class="blok" aria-labelledby="hGrafik">
+    <h2 id="hGrafik">Omzet per hari</h2>
+    <div class="grafik" id="grafik"></div>
+  </section>
+
+  <div class="dua">
+    <section class="blok" aria-labelledby="hMetode">
+      <h2 id="hMetode">Metode pembayaran</h2>
+      <div id="daftarMetode"></div>
+    </section>
+    <section class="blok" aria-labelledby="hProduk">
+      <h2 id="hProduk">Produk terlaris</h2>
+      <div id="daftarProduk"></div>
+    </section>
+  </div>
+
+  <p class="catatan">Angka berasal dari rekap yang dikirim HP tiap cabang, jadi bisa tertinggal beberapa jam dari kondisi di toko. Produk terlaris dihitung dari 10 produk teratas per hari per cabang.</p>
+</div>
+
+<script>
+/* Logika murni dashboard (tanpa DOM & Firebase) - diuji terpisah di Node. */
+(function (root) {
+  'use strict';
+
+  var BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  var BULAN_PENDEK = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  var HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  var MAKS_HARI_RENTANG = 92;
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function num(v) { return typeof v === 'number' && isFinite(v) ? v : 0; }
+
+  /* ---------- tanggal ---------- */
+  function isoTanggal(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+
+  function parseIso(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s));
+    if (!m) return null;
+    var d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 12);
+    return isoTanggal(d) === s ? d : null; // menolak 2026-02-31 dsb.
+  }
+
+  function tambahHari(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n, 12); }
+
+  function rentangPreset(nama, sekarang) {
+    var t = new Date(sekarang.getFullYear(), sekarang.getMonth(), sekarang.getDate(), 12);
+    var dari = t, sampai = t;
+    if (nama === 'kemarin') { dari = sampai = tambahHari(t, -1); }
+    else if (nama === '7-hari') { dari = tambahHari(t, -6); }
+    else if (nama === 'bulan-ini') { dari = new Date(t.getFullYear(), t.getMonth(), 1, 12); }
+    else if (nama === 'bulan-lalu') {
+      dari = new Date(t.getFullYear(), t.getMonth() - 1, 1, 12);
+      sampai = new Date(t.getFullYear(), t.getMonth(), 0, 12);
+    }
+    return { dari: isoTanggal(dari), sampai: isoTanggal(sampai) };
+  }
+
+  function daftarTanggal(dari, sampai) {
+    var a = parseIso(dari), b = parseIso(sampai), hasil = [];
+    if (!a || !b) return hasil;
+    for (var d = a, i = 0; d <= b && i < 400; d = tambahHari(d, 1), i++) hasil.push(isoTanggal(d));
+    return hasil;
+  }
+
+  function validasiRentang(dari, sampai) {
+    var a = parseIso(dari), b = parseIso(sampai);
+    if (!a || !b) return 'Tanggal belum lengkap.';
+    if (a > b) return 'Tanggal awal harus sebelum tanggal akhir.';
+    if (daftarTanggal(dari, sampai).length > MAKS_HARI_RENTANG) return 'Rentang maksimal ' + MAKS_HARI_RENTANG + ' hari.';
+    return null;
+  }
+
+  function validasiTokoId(mentah) {
+    var t = String(mentah == null ? '' : mentah).trim();
+    if (!t) return 'Kode toko wajib diisi.';
+    if (!/^[A-Za-z0-9_-]{6,128}$/.test(t)) return 'Kode toko hanya boleh huruf, angka, "-" dan "_" (minimal 6 karakter).';
+    return null;
+  }
+
+  function tanggalPendek(iso) {
+    var d = parseIso(iso);
+    return d ? d.getDate() + ' ' + BULAN_PENDEK[d.getMonth()] : String(iso);
+  }
+  function tanggalPanjang(iso) {
+    var d = parseIso(iso);
+    return d ? HARI[d.getDay()] + ', ' + d.getDate() + ' ' + BULAN[d.getMonth()] + ' ' + d.getFullYear() : String(iso);
+  }
+
+  /* ---------- angka ---------- */
+  function ribuan(n) { return String(Math.round(Math.abs(n))).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function rupiah(n) { n = num(n); return (Math.round(n) < 0 ? '-Rp ' : 'Rp ') + ribuan(n); }
+  function ringkas(n) {
+    n = num(n);
+    var a = Math.abs(n), s = n < 0 ? '-' : '', v;
+    if (a >= 1e9) { v = (a / 1e9).toFixed(1) + ' M'; }
+    else if (a >= 1e6) { v = (a / 1e6).toFixed(1) + ' jt'; }
+    else if (a >= 1e3) { v = (a / 1e3).toFixed(1) + ' rb'; }
+    else { v = String(Math.round(a)); }
+    return s + v.replace('.0', '').replace('.', ',');
+  }
+  function persen(bagian, total) { return total > 0 ? Math.round((bagian / total) * 100) : 0; }
+
+  function niceMax(v) {
+    if (!(v > 0)) return 1;
+    var pangkat = Math.pow(10, Math.floor(Math.log(v) / Math.LN10));
+    var kandidat = [1, 2, 2.5, 5, 10];
+    for (var i = 0; i < kandidat.length; i++) { if (kandidat[i] * pangkat >= v) return kandidat[i] * pangkat; }
+    return 10 * pangkat;
+  }
+
+  /* ---------- waktu relatif & kesegaran ---------- */
+  function waktuRelatif(ms, sekarangMs) {
+    if (!ms) return 'belum pernah';
+    var s = Math.max(0, Math.floor((sekarangMs - ms) / 1000));
+    if (s < 60) return 'baru saja';
+    var m = Math.floor(s / 60);
+    if (m < 60) return m + ' menit lalu';
+    var j = Math.floor(m / 60);
+    if (j < 24) return j + ' jam lalu';
+    return Math.floor(j / 24) + ' hari lalu';
+  }
+  // HP cabang mengirim tiap 3 jam: <4 jam wajar, <8 jam terlambat, selebihnya patut dicek.
+  function statusSegar(ms, sekarangMs) {
+    if (!ms) return 'kosong';
+    var jam = (sekarangMs - ms) / 3600000;
+    return jam < 4 ? 'baik' : (jam < 8 ? 'lambat' : 'lama');
+  }
+
+  /* ---------- normalisasi dokumen Firestore ---------- */
+  function normalisasi(d) {
+    if (!d || typeof d.tanggal !== 'string' || typeof d.kodeDokumen !== 'string') return null;
+    var metode = (Array.isArray(d.metodePembayaran) ? d.metodePembayaran : []).filter(function (x) {
+      return x && typeof x.metode === 'string';
+    }).map(function (x) { return { metode: x.metode, total: num(x.total), jumlahTransaksi: num(x.jumlahTransaksi) }; });
+    var produk = (Array.isArray(d.produkTerlaris) ? d.produkTerlaris : []).filter(function (x) {
+      return x && typeof x.nama === 'string';
+    }).map(function (x) { return { nama: x.nama, qty: num(x.qty), omzet: num(x.omzet) }; });
+    return {
+      tanggal: d.tanggal,
+      kodeDokumen: d.kodeDokumen,
+      kodeCabang: typeof d.kodeCabang === 'string' ? d.kodeCabang : d.kodeDokumen,
+      namaCabang: typeof d.namaCabang === 'string' ? d.namaCabang : d.kodeDokumen,
+      jumlahTransaksi: num(d.jumlahTransaksi),
+      totalPenjualan: num(d.totalPenjualan),
+      totalDiskon: num(d.totalDiskon),
+      produkTerjual: num(d.produkTerjual),
+      estimasiKeuntungan: num(d.estimasiKeuntungan),
+      metodePembayaran: metode,
+      produkTerlaris: produk,
+      diperbaruiPada: num(d.diperbaruiPada)
+    };
+  }
+
+  /* ---------- agregasi ---------- */
+  function agregasi(daftar, tanggalList, kodeAnggota) {
+    var total = { omzet: 0, transaksi: 0, diskon: 0, produkTerjual: 0, untung: 0 };
+    var cab = {}, hari = {}, metode = {}, produk = {};
+    tanggalList.forEach(function (t) { hari[t] = { tanggal: t, total: 0, perCabang: {} }; });
+
+    daftar.forEach(function (r) {
+      total.omzet += r.totalPenjualan;
+      total.transaksi += r.jumlahTransaksi;
+      total.diskon += r.totalDiskon;
+      total.produkTerjual += r.produkTerjual;
+      total.untung += r.estimasiKeuntungan;
+
+      var c = cab[r.kodeDokumen];
+      if (!c) { c = cab[r.kodeDokumen] = { kodeDokumen: r.kodeDokumen, kode: r.kodeCabang, nama: r.namaCabang, omzet: 0, transaksi: 0, terakhir: 0, belumKirim: false }; }
+      c.omzet += r.totalPenjualan;
+      c.transaksi += r.jumlahTransaksi;
+      if (r.diperbaruiPada >= c.terakhir) { c.terakhir = r.diperbaruiPada; c.nama = r.namaCabang; c.kode = r.kodeCabang; }
+
+      var h = hari[r.tanggal];
+      if (h) {
+        h.total += r.totalPenjualan;
+        h.perCabang[r.kodeDokumen] = (h.perCabang[r.kodeDokumen] || 0) + r.totalPenjualan;
+      }
+
+      r.metodePembayaran.forEach(function (m) {
+        var k = m.metode.trim().toUpperCase();
+        var e = metode[k] || (metode[k] = { metode: m.metode.trim(), total: 0, jumlah: 0 });
+        e.total += m.total; e.jumlah += m.jumlahTransaksi;
+      });
+      r.produkTerlaris.forEach(function (p) {
+        var k = p.nama.trim().toLowerCase();
+        var e = produk[k] || (produk[k] = { nama: p.nama.trim(), qty: 0, omzet: 0 });
+        e.qty += p.qty; e.omzet += p.omzet;
+      });
+    });
+
+    (kodeAnggota || []).forEach(function (kode) {
+      if (!cab[kode]) cab[kode] = { kodeDokumen: kode, kode: kode, nama: kode, omzet: 0, transaksi: 0, terakhir: 0, belumKirim: true };
+    });
+
+    function nilai(o) { return Object.keys(o).map(function (k) { return o[k]; }); }
+    return {
+      total: total,
+      perCabang: nilai(cab).sort(function (a, b) { return b.omzet - a.omzet || a.nama.localeCompare(b.nama); }),
+      perHari: tanggalList.map(function (t) { return hari[t]; }),
+      metode: nilai(metode).sort(function (a, b) { return b.total - a.total; }),
+      produk: nilai(produk).sort(function (a, b) { return b.qty - a.qty || b.omzet - a.omzet; }).slice(0, 10)
+    };
+  }
+
+  /* ---------- CSV (pemisah ";" agar terbuka rapi di Excel berlokal Indonesia) ---------- */
+  function sel(v) {
+    var s = String(v == null ? '' : v);
+    // cegah injeksi rumus spreadsheet dari teks yang dikirim HP
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  function csv(daftar) {
+    var kepala = ['Tanggal', 'Kode Cabang', 'Nama Cabang', 'Jumlah Transaksi', 'Total Penjualan', 'Total Diskon', 'Produk Terjual', 'Estimasi Keuntungan', 'Diperbarui'];
+    var baris = daftar.slice().sort(function (a, b) {
+      return a.tanggal < b.tanggal ? -1 : a.tanggal > b.tanggal ? 1 : a.kodeDokumen.localeCompare(b.kodeDokumen);
+    }).map(function (r) {
+      var w = r.diperbaruiPada ? new Date(r.diperbaruiPada) : null;
+      return [r.tanggal, r.kodeCabang, r.namaCabang, r.jumlahTransaksi, Math.round(r.totalPenjualan), Math.round(r.totalDiskon),
+        r.produkTerjual, Math.round(r.estimasiKeuntungan),
+        w ? isoTanggal(w) + ' ' + pad2(w.getHours()) + ':' + pad2(w.getMinutes()) : ''].map(sel).join(';');
+    });
+    return [kepala.map(sel).join(';')].concat(baris).join('\r\n');
+  }
+
+  root.NadaLogika = {
+    MAKS_HARI_RENTANG: MAKS_HARI_RENTANG,
+    isoTanggal: isoTanggal, parseIso: parseIso, rentangPreset: rentangPreset, daftarTanggal: daftarTanggal,
+    validasiRentang: validasiRentang, validasiTokoId: validasiTokoId, tanggalPendek: tanggalPendek, tanggalPanjang: tanggalPanjang,
+    rupiah: rupiah, ringkas: ringkas, persen: persen, niceMax: niceMax, waktuRelatif: waktuRelatif, statusSegar: statusSegar,
+    normalisasi: normalisasi, agregasi: agregasi, csv: csv
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, query, where, orderBy, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const L = window.NadaLogika;
+// Konfigurasi aplikasi Web Firebase. Bukan rahasia: keamanan data dijaga firestore.rules.
+const firebaseConfig = {
+  apiKey: "AIzaSyCAzpAxVmiixg-ZqnyeGoAvwzN1xhO6dxs",
+  authDomain: "nadapos-4ba51.firebaseapp.com",
+  projectId: "nadapos-4ba51",
+  storageBucket: "nadapos-4ba51.firebasestorage.app",
+  messagingSenderId: "228262249178",
+  appId: "1:228262249178:web:bf94dfb7c5423fee945be3"
+};
+
+const WARNA = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#EC4899', '#84CC16'];
+const KUNCI_TOKO = 'nadapantau_toko';
+const $ = (id) => document.getElementById(id);
+
+const auth = getAuth(initializeApp(firebaseConfig));
+const db = getFirestore(auth.app);
+
+const state = {
+  user: null, tokoId: null, preset: 'hari-ini', dari: '', sampai: '',
+  rekap: [], anggota: [], hariDipilih: null, terhubung: false, galat: null, pembaruan: 0, berhenti: null, penghitung: null
+};
+
+/* ---------- util tampilan ---------- */
+function esc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function tampil(el, ya) { el.hidden = !ya; }
+function sekarang() { return new Date(); }
+function jamMenit(ms) { const d = new Date(ms); return String(d.getHours()).padStart(2, '0') + '.' + String(d.getMinutes()).padStart(2, '0'); }
+
+/* ---------- masuk / keluar ---------- */
+const PESAN_AUTH = {
+  'auth/invalid-credential': 'Email atau password salah.',
+  'auth/wrong-password': 'Email atau password salah.',
+  'auth/user-not-found': 'Email atau password salah.',
+  'auth/invalid-email': 'Format email tidak valid.',
+  'auth/too-many-requests': 'Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.',
+  'auth/network-request-failed': 'Tidak ada koneksi internet.',
+  'auth/user-disabled': 'Akun ini dinonaktifkan. Hubungi pemilik toko.'
+};
+
+$('formMasuk').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = $('email').value.trim(), sandi = $('sandi').value;
+  const galat = $('galatMasuk');
+  galat.hidden = true;
+  if (!email || !sandi) { galat.textContent = 'Email dan password wajib diisi.'; galat.hidden = false; return; }
+  $('tombolMasuk').disabled = true; $('tombolMasuk').textContent = 'Memeriksa…';
+  try {
+    await signInWithEmailAndPassword(auth, email, sandi);
+    $('sandi').value = '';
+  } catch (err) {
+    galat.textContent = PESAN_AUTH[err && err.code] || 'Gagal masuk. Coba lagi.';
+    galat.hidden = false;
+  } finally {
+    $('tombolMasuk').disabled = false; $('tombolMasuk').textContent = 'Masuk';
+  }
+});
+
+$('tombolKeluar').addEventListener('click', () => { signOut(auth); });
+
+onAuthStateChanged(auth, (user) => {
+  state.user = user;
+  if (!user) {
+    hentikan();
+    tampil($('app'), false); tampil($('masuk'), true);
+    return;
+  }
+  tampil($('masuk'), false); tampil($('app'), true);
+  $('emailPengguna').textContent = user.email || '';
+  state.tokoId = localStorage.getItem(KUNCI_TOKO) || user.uid;
+  if (!state.dari) pilihPreset('hari-ini', true);
+  mulai();
+});
+
+/* ---------- data ---------- */
+function hentikan() {
+  if (state.berhenti) { state.berhenti(); state.berhenti = null; }
+  if (state.penghitung) { clearInterval(state.penghitung); state.penghitung = null; }
+  state.rekap = []; state.anggota = []; state.terhubung = false; state.galat = null;
+}
+
+async function muatAnggota() {
+  try {
+    const snap = await getDocs(collection(db, 'toko', state.tokoId, 'anggota'));
+    state.anggota = snap.docs.map((d) => d.data()).filter((d) => d && d.peran === 'CABANG' && typeof d.kodeDokumen === 'string').map((d) => d.kodeDokumen);
+  } catch (e) { state.anggota = []; }
+}
+
+async function mulai() {
+  hentikan();
+  tampil($('panelAkses'), false);
+  await muatAnggota();
+  berlangganan();
+  state.penghitung = setInterval(render, 60000); // segarkan teks "x menit lalu"
+  render();
+}
+
+function berlangganan() {
+  if (state.berhenti) { state.berhenti(); state.berhenti = null; }
+  state.terhubung = false; state.galat = null;
+  const q = query(
+    collection(db, 'toko', state.tokoId, 'rekap'),
+    where('tanggal', '>=', state.dari), where('tanggal', '<=', state.sampai), orderBy('tanggal', 'asc')
+  );
+  state.berhenti = onSnapshot(q, (snap) => {
+    state.rekap = snap.docs.map((d) => L.normalisasi(d.data())).filter(Boolean);
+    state.terhubung = true; state.galat = null; state.pembaruan = Date.now();
+    tampil($('panelAkses'), false);
+    render();
+  }, (err) => {
+    state.terhubung = false; state.galat = err || { code: 'unknown' };
+    if (err && err.code === 'permission-denied') {
+      state.rekap = [];
+      $('inputToko').value = state.tokoId || '';
+      tampil($('panelAkses'), true);
+    }
+    render();
+  });
+}
+
+$('formToko').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const v = $('inputToko').value.trim(), galat = L.validasiTokoId(v), el = $('galatToko');
+  if (galat) { el.textContent = galat; el.hidden = false; return; }
+  el.hidden = true;
+  localStorage.setItem(KUNCI_TOKO, v);
+  state.tokoId = v;
+  mulai();
+});
+
+/* ---------- filter tanggal ---------- */
+function setChip(nama) {
+  document.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.preset === nama)));
+}
+function pilihPreset(nama, tanpaMulai) {
+  state.preset = nama; setChip(nama); state.hariDipilih = null;
+  if (nama === 'kustom') { tampil($('formTanggal'), true); $('tglDari').value = state.dari; $('tglSampai').value = state.sampai; return; }
+  tampil($('formTanggal'), false);
+  const r = L.rentangPreset(nama, sekarang());
+  state.dari = r.dari; state.sampai = r.sampai;
+  if (!tanpaMulai) berlangganan();
+  render();
+}
+document.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => pilihPreset(c.dataset.preset)));
+$('formTanggal').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const dari = $('tglDari').value, sampai = $('tglSampai').value, galat = L.validasiRentang(dari, sampai), el = $('galatTanggal');
+  if (galat) { el.textContent = galat; el.hidden = false; return; }
+  el.hidden = true; state.dari = dari; state.sampai = sampai; state.hariDipilih = null;
+  berlangganan(); render();
+});
+
+/* ---------- unduh CSV ---------- */
+$('tombolCsv').addEventListener('click', () => {
+  if (!state.rekap.length) return;
+  const blob = new Blob(['\uFEFF' + L.csv(state.rekap)], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'rekap-' + state.dari + '_' + state.sampai + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+/* ---------- render ---------- */
+function render() {
+  if (!state.user) return;
+  const err = state.galat;
+  const hari = L.daftarTanggal(state.dari, state.sampai);
+  const a = L.agregasi(state.rekap, hari, state.anggota);
+  const kini = Date.now();
+  const termasukHariIni = state.sampai === L.isoTanggal(sekarang());
+
+  // status koneksi
+  const titik = $('titikSambung');
+  if (state.terhubung) { titik.className = 'titik baik'; $('teksSambung').textContent = 'Tersambung, diperbarui ' + jamMenit(state.pembaruan); }
+  else if (err && err.code !== 'permission-denied') { titik.className = 'titik lama'; $('teksSambung').textContent = 'Gagal memuat data. Periksa koneksi internet.'; }
+  else if (err) { titik.className = 'titik lama'; $('teksSambung').textContent = 'Tidak ada izin akses'; }
+  else { titik.className = 'titik'; $('teksSambung').textContent = 'Menyambung…'; }
+  $('teksRentang').textContent = state.dari === state.sampai ? L.tanggalPanjang(state.dari) : L.tanggalPendek(state.dari) + ' sampai ' + L.tanggalPendek(state.sampai) + ' ' + state.sampai.slice(0, 4);
+  $('tombolCsv').hidden = state.rekap.length === 0;
+
+  // pita ringkasan
+  const rata = a.total.transaksi > 0 ? a.total.omzet / a.total.transaksi : 0;
+  $('pita').innerHTML =
+    '<div class="utama"><div class="judul">Total omzet</div><div class="besar">' + esc(L.rupiah(a.total.omzet)) + '</div></div>' +
+    '<dl>' +
+    '<div><dt>Transaksi</dt><dd>' + esc(a.total.transaksi) + '</dd></div>' +
+    '<div><dt>Rata-rata per transaksi</dt><dd>' + esc(L.rupiah(rata)) + '</dd></div>' +
+    '<div><dt>Produk terjual</dt><dd>' + esc(a.total.produkTerjual) + '</dd></div>' +
+    '<div><dt>Estimasi keuntungan</dt><dd>' + esc(L.rupiah(a.total.untung)) + '</dd></div>' +
+    '</dl>';
+
+  // warna stabil per cabang (urut kode)
+  const kodeUrut = a.perCabang.map((c) => c.kodeDokumen).sort();
+  const warna = (kode) => WARNA[kodeUrut.indexOf(kode) % WARNA.length];
+
+  // buku cabang
+  const jumlahKirim = a.perCabang.filter((c) => !c.belumKirim).length;
+  $('infoCab').textContent = a.perCabang.length ? jumlahKirim + ' dari ' + a.perCabang.length + ' sudah mengirim rekap' : '';
+  if (!a.perCabang.length) {
+    $('daftarCab').innerHTML = '<li class="kosong">Belum ada rekap pada rentang ini. Pastikan HP cabang sudah menyalakan "Kirim rekap otomatis" di Pengaturan, Pantau Cabang.</li>';
+  } else {
+    $('daftarCab').innerHTML = a.perCabang.map((c) => {
+      const seg = termasukHariIni || c.belumKirim ? L.statusSegar(c.terakhir, kini) : null;
+      const status = seg
+        ? '<span class="titik ' + seg + '"></span>' + (c.belumKirim ? 'Belum mengirim rekap' : 'Update terakhir ' + esc(L.waktuRelatif(c.terakhir, kini)))
+        : '';
+      const p = L.persen(c.omzet, a.total.omzet);
+      return '<li class="cab">' +
+        '<div class="nama"><span class="sw" style="background:' + warna(c.kodeDokumen) + '"></span>' + esc(c.nama) + '<small>' + esc(c.kode) + '</small></div>' +
+        '<div class="angka">' + esc(L.rupiah(c.omzet)) + '</div>' +
+        '<div class="sub">' + status + '</div>' +
+        '<div class="sub kanan">' + esc(c.transaksi) + ' transaksi, ' + esc(p) + '%</div>' +
+        '<div class="bar"><i style="width:' + p + '%;background:' + warna(c.kodeDokumen) + '"></i></div>' +
+        '</li>';
+    }).join('');
+  }
+
+  $('grafik').innerHTML = grafikHtml(a, hari, kodeUrut, warna);
+  $('daftarMetode').innerHTML = barisMendatar(a.metode.map((m) => ({ nama: m.metode, nilai: m.total, teks: L.rupiah(m.total), sub: m.jumlah + ' transaksi' })), 'Belum ada data pembayaran.');
+  $('daftarProduk').innerHTML = barisMendatar(a.produk.map((p) => ({ nama: p.nama, nilai: p.qty, teks: p.qty + ' terjual', sub: L.rupiah(p.omzet) })), 'Belum ada data produk.');
+}
+
+function barisMendatar(item, kosong) {
+  if (!item.length) return '<p class="kosong">' + esc(kosong) + '</p>';
+  const maks = Math.max.apply(null, item.map((i) => i.nilai)) || 1;
+  return item.map((i) =>
+    '<div class="bm"><div class="baris"><b>' + esc(i.nama) + '</b><span>' + esc(i.teks) + '</span></div>' +
+    '<div class="baris small muted"><span>' + esc(i.sub) + '</span></div>' +
+    '<div class="bar"><i style="width:' + Math.max(2, Math.round(i.nilai / maks * 100)) + '%"></i></div></div>'
+  ).join('');
+}
+
+function grafikHtml(a, hari, kodeUrut, warna) {
+  if (!a.total.omzet) return '<p class="kosong">Belum ada omzet pada rentang ini.</p>';
+  const W = 640, H = 230, kiri = 46, kanan = 6, atas = 10, bawah = 26;
+  const n = hari.length, slot = (W - kiri - kanan) / n, lebar = Math.max(2, Math.min(36, slot * 0.7));
+  const maks = L.niceMax(Math.max.apply(null, a.perHari.map((h) => h.total)));
+  const tinggi = H - atas - bawah, y = (v) => atas + tinggi - (v / maks) * tinggi;
+  let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Grafik omzet per hari">';
+  [0, 0.5, 1].forEach((f) => {
+    const yy = y(maks * f);
+    s += '<line class="garis" x1="' + kiri + '" x2="' + (W - kanan) + '" y1="' + yy + '" y2="' + yy + '"/>' +
+      '<text class="sumbu" x="' + (kiri - 6) + '" y="' + (yy + 4) + '" text-anchor="end">' + esc(L.ringkas(maks * f)) + '</text>';
+  });
+  const langkah = Math.ceil(n / 7);
+  a.perHari.forEach((h, i) => {
+    const x0 = kiri + i * slot, xb = x0 + (slot - lebar) / 2;
+    s += '<rect class="hit' + (state.hariDipilih === h.tanggal ? ' pilih' : '') + '" data-tgl="' + h.tanggal + '" x="' + x0 + '" y="' + atas + '" width="' + slot + '" height="' + tinggi + '"><title>' + esc(L.tanggalPanjang(h.tanggal) + ': ' + L.rupiah(h.total)) + '</title></rect>';
+    let alas = atas + tinggi;
+    kodeUrut.forEach((kode) => {
+      const v = h.perCabang[kode] || 0;
+      if (v <= 0) return;
+      const t = (v / maks) * tinggi;
+      alas -= t;
+      s += '<rect x="' + xb + '" y="' + alas + '" width="' + lebar + '" height="' + t + '" fill="' + warna(kode) + '" pointer-events="none"/>';
+    });
+    if (i % langkah === 0 || i === n - 1 && n < 8) {
+      s += '<text class="sumbu" x="' + (x0 + slot / 2) + '" y="' + (H - 8) + '" text-anchor="middle">' + esc(L.tanggalPendek(h.tanggal)) + '</text>';
+    }
+  });
+  s += '</svg>';
+  if (a.perCabang.length > 1) {
+    s += '<div class="legenda">' + kodeUrut.map((k) => {
+      const c = a.perCabang.find((x) => x.kodeDokumen === k);
+      return '<span><span class="sw" style="background:' + warna(k) + '"></span>' + esc(c ? c.nama : k) + '</span>';
+    }).join('') + '</div>';
+  }
+  const dipilih = a.perHari.find((h) => h.tanggal === state.hariDipilih);
+  if (dipilih) {
+    const bagian = kodeUrut.filter((k) => dipilih.perCabang[k]).map((k) => {
+      const c = a.perCabang.find((x) => x.kodeDokumen === k);
+      return esc(c ? c.nama : k) + ' ' + esc(L.rupiah(dipilih.perCabang[k]));
+    });
+    s += '<div class="rinci-hari"><b>' + esc(L.tanggalPanjang(dipilih.tanggal)) + '</b>: ' + esc(L.rupiah(dipilih.total)) + (bagian.length ? '. ' + bagian.join(', ') + '.' : '') + '</div>';
+  } else {
+    s += '<p class="small muted" style="margin-top:8px">Ketuk satu hari untuk melihat rinciannya.</p>';
+  }
+  return s;
+}
+
+$('grafik').addEventListener('click', (e) => {
+  const r = e.target.closest && e.target.closest('[data-tgl]');
+  if (!r) return;
+  state.hariDipilih = state.hariDipilih === r.dataset.tgl ? null : r.dataset.tgl;
+  render();
+});
+</script>
+</body>
+</html>
