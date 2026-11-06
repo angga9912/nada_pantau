@@ -127,6 +127,12 @@ label.f { display: block; font-weight: 700; margin: 14px 0 6px; }
 .peringatan b { display: block; margin-bottom: 4px; }
 .catatan { margin: 32px 0 24px; color: var(--muted); font-size: 13px; }
 @media (prefers-reduced-motion: no-preference) { .chip, .btn { transition: background-color .12s, border-color .12s; } }
+.undang { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin-top: 14px; }
+@media (max-width: 640px) { .undang { grid-template-columns: 1fr; } }
+.kl { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.kl .aksi { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.kode { font: 700 16px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: .08em; padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; background: var(--soft); }
+.hasil { margin-top: 14px; padding: 12px 14px; border: 1px solid var(--ok); border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -136,7 +142,7 @@ label.f { display: block; font-weight: 700; margin: 14px 0 6px; }
 <main id="masuk" hidden>
   <div class="panel-masuk">
     <div class="merek"><span class="logo" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M14 46V18h8l20 18V18h8v28h-8L22 28v18z"/></svg></span>Nada Pantau</div>
-    <h1>Masuk sebagai admin</h1>
+    <h1 id="judulMasuk">Masuk sebagai admin</h1>
     <p class="muted">Pantau penjualan semua cabang dari satu tempat.</p>
     <form id="formMasuk" novalidate>
       <label class="f" for="email">Email</label>
@@ -146,6 +152,22 @@ label.f { display: block; font-weight: 700; margin: 14px 0 6px; }
       <p class="galat" id="galatMasuk" role="alert" hidden></p>
       <button class="btn utama" id="tombolMasuk" type="submit" style="width:100%;margin-top:18px">Masuk</button>
     </form>
+    <form id="formDaftar" novalidate hidden>
+      <label class="f" for="dNama">Nama toko</label>
+      <input class="isian" id="dNama" maxlength="60" autocomplete="organization">
+      <label class="f" for="dEmail">Email</label>
+      <input class="isian" id="dEmail" type="email" autocomplete="username" inputmode="email">
+      <label class="f" for="dSandi">Password (minimal 6 karakter)</label>
+      <input class="isian" id="dSandi" type="password" autocomplete="new-password">
+      <label class="f" for="dKode">Kode Aktivasi</label>
+      <input class="isian" id="dKode" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Dari penjual Nada Pos">
+      <p class="galat" id="galatDaftar" role="alert" hidden></p>
+      <button class="btn utama" id="tombolDaftar" type="submit" style="width:100%;margin-top:18px">Daftarkan toko</button>
+    </form>
+    <p style="margin-top:16px;text-align:center">
+      <button class="btn tautan" id="keDaftar" type="button">Belum punya toko? Daftar di sini</button>
+      <button class="btn tautan" id="keMasuk" type="button" hidden>Sudah punya akun? Masuk</button>
+    </p>
   </div>
 </main>
 
@@ -193,6 +215,19 @@ label.f { display: block; font-weight: 700; margin: 14px 0 6px; }
   <section class="blok" aria-labelledby="hCab">
     <h2 id="hCab">Cabang <span id="infoCab"></span></h2>
     <ul class="daftar" id="daftarCab"></ul>
+  </section>
+
+  <section class="blok" id="blokKelola" aria-labelledby="hKelola" hidden>
+    <h2 id="hKelola">Kelola cabang <span id="infoKelola"></span></h2>
+    <form id="formUndang" class="undang" novalidate>
+      <input class="isian" id="kNama" placeholder="Nama cabang, mis. Cabang Bojong" aria-label="Nama cabang" maxlength="60" autocomplete="off">
+      <input class="isian" id="kKode" placeholder="Kode cabang, mis. CBG01" aria-label="Kode cabang" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      <button class="btn utama" id="tombolUndang" type="submit">Buat undangan</button>
+    </form>
+    <p class="small muted" id="catatKelola"></p>
+    <p class="galat" id="galatKelola" role="alert" hidden></p>
+    <div class="hasil" id="hasilUndangan" role="status" hidden></div>
+    <ul class="daftar" id="daftarKelola"></ul>
   </section>
 
   <section class="blok" aria-labelledby="hGrafik">
@@ -432,8 +467,8 @@ label.f { display: block; font-weight: 700; margin: 14px 0 6px; }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, query, where, orderBy, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, query, where, orderBy, onSnapshot, getDocs, getDoc, doc, setDoc, deleteDoc, writeBatch, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const L = window.NadaLogika;
 // Konfigurasi aplikasi Web Firebase. Bukan rahasia: keamanan data dijaga firestore.rules.
@@ -474,7 +509,9 @@ const PESAN_AUTH = {
   'auth/invalid-email': 'Format email tidak valid.',
   'auth/too-many-requests': 'Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.',
   'auth/network-request-failed': 'Tidak ada koneksi internet.',
-  'auth/user-disabled': 'Akun ini dinonaktifkan. Hubungi pemilik toko.'
+  'auth/user-disabled': 'Akun ini dinonaktifkan. Hubungi pemilik toko.',
+  'auth/email-already-in-use': 'Email ini sudah terdaftar dengan password berbeda. Masuk dengan password yang benar.',
+  'auth/weak-password': 'Password terlalu lemah. Pakai minimal 6 karakter.'
 };
 
 $('formMasuk').addEventListener('submit', async (e) => {
@@ -497,18 +534,24 @@ $('formMasuk').addEventListener('submit', async (e) => {
 
 $('tombolKeluar').addEventListener('click', () => { signOut(auth); });
 
-onAuthStateChanged(auth, (user) => {
-  state.user = user;
-  if (!user) {
-    hentikan();
-    tampil($('app'), false); tampil($('masuk'), true);
-    return;
-  }
+function masukKeApp(user) {
   tampil($('masuk'), false); tampil($('app'), true);
   $('emailPengguna').textContent = user.email || '';
   state.tokoId = localStorage.getItem(KUNCI_TOKO) || user.uid;
   if (!state.dari) pilihPreset('hari-ini', true);
   mulai();
+}
+
+onAuthStateChanged(auth, (user) => {
+  state.user = user;
+  if (!user) {
+    state.mendaftar = false;
+    hentikan();
+    tampil($('app'), false); tampil($('masuk'), true);
+    return;
+  }
+  if (state.mendaftar) return; // pendaftaran toko sedang berjalan; layar dibuka setelah selesai
+  masukKeApp(user);
 });
 
 /* ---------- data ---------- */
@@ -529,6 +572,7 @@ async function mulai() {
   hentikan();
   tampil($('panelAkses'), false);
   await muatAnggota();
+  muatKelola();
   berlangganan();
   state.penghitung = setInterval(render, 60000); // segarkan teks "x menit lalu"
   render();
@@ -565,6 +609,165 @@ $('formToko').addEventListener('submit', (e) => {
   localStorage.setItem(KUNCI_TOKO, v);
   state.tokoId = v;
   mulai();
+});
+
+/* ---------- pendaftaran toko ---------- */
+function modeDaftar(ya) {
+  tampil($('formMasuk'), !ya); tampil($('formDaftar'), ya);
+  tampil($('keDaftar'), !ya); tampil($('keMasuk'), ya);
+  $('judulMasuk').textContent = ya ? 'Daftarkan toko' : 'Masuk sebagai admin';
+}
+$('keDaftar').addEventListener('click', () => modeDaftar(true));
+$('keMasuk').addEventListener('click', () => modeDaftar(false));
+
+$('formDaftar').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nama = $('dNama').value.trim(), email = $('dEmail').value.trim(), sandi = $('dSandi').value;
+  const kode = $('dKode').value.trim().toUpperCase().replace(/\s+/g, '');
+  const galat = $('galatDaftar'), tombol = $('tombolDaftar');
+  const gagal = (t) => { galat.textContent = t; galat.hidden = false; };
+  galat.hidden = true;
+  if (!nama || nama.length > 60) return gagal('Isi nama toko, maksimal 60 karakter.');
+  if (!email) return gagal('Email wajib diisi.');
+  if (sandi.length < 6) return gagal('Password minimal 6 karakter.');
+  if (!/^[A-Z0-9]{6,20}$/.test(kode)) return gagal('Isi Kode Aktivasi dari penjual Nada Pos.');
+  tombol.disabled = true; tombol.textContent = 'Mendaftarkan…';
+  state.mendaftar = true;
+  try {
+    let user = auth.currentUser && auth.currentUser.email === email ? auth.currentUser : null;
+    if (!user) {
+      try { user = (await createUserWithEmailAndPassword(auth, email, sandi)).user; }
+      catch (err) {
+        if (err && err.code === 'auth/email-already-in-use') user = (await signInWithEmailAndPassword(auth, email, sandi)).user;
+        else throw err;
+      }
+    }
+    const ref = doc(db, 'aktivasi', kode);
+    const a = await getDoc(ref);
+    if (!a.exists()) return gagal('Kode Aktivasi tidak ditemukan. Periksa penulisannya.');
+    const d = a.data();
+    if (d.aktif !== true) return gagal('Kode Aktivasi ini tidak aktif. Hubungi penjual Nada Pos.');
+    if (d.dipakaiOleh) return gagal('Kode Aktivasi ini sudah dipakai.');
+    const b = writeBatch(db);
+    b.set(doc(db, 'toko', user.uid), { nama, aktif: true, batasCabang: d.batasCabang, kodeAktivasi: kode, dibuatPada: serverTimestamp() });
+    b.update(ref, { dipakaiOleh: user.uid, dipakaiPada: serverTimestamp() });
+    await b.commit();
+    localStorage.removeItem(KUNCI_TOKO);
+    state.mendaftar = false;
+    masukKeApp(user);
+  } catch (err) {
+    const c = err && err.code;
+    gagal(PESAN_AUTH[c] || (c === 'permission-denied'
+      ? 'Pendaftaran ditolak. Kode mungkin baru saja dipakai, atau akun ini sudah punya toko.'
+      : 'Pendaftaran gagal. Periksa koneksi internet lalu coba lagi.'));
+  } finally {
+    state.mendaftar = false; tombol.disabled = false; tombol.textContent = 'Daftarkan toko';
+  }
+});
+
+/* ---------- kelola cabang (khusus pemilik toko) ---------- */
+const HARI = 864e5;
+function kodeAcak() {
+  const abjad = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', a = new Uint32Array(10);
+  crypto.getRandomValues(a);
+  return Array.from(a, (x) => abjad[x % abjad.length]).join('');
+}
+const tglPendek = (ms) => new Date(ms).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+function statusUndangan(u) {
+  if (u.dipakaiOleh) return 'terpakai';
+  return u.berlakuSampai && u.berlakuSampai.toMillis() < Date.now() ? 'kedaluwarsa' : 'menunggu';
+}
+function galatKelola(t) { const el = $('galatKelola'); el.textContent = t || ''; el.hidden = !t; }
+
+async function muatKelola() {
+  const pemilik = !!state.user && state.tokoId === state.user.uid;
+  tampil($('blokKelola'), pemilik);
+  if (!pemilik) return;
+  const tokoId = state.tokoId;
+  try {
+    const [tk, und, ang] = await Promise.all([
+      getDoc(doc(db, 'toko', tokoId)),
+      getDocs(query(collection(db, 'undangan'), where('tokoId', '==', tokoId))),
+      getDocs(collection(db, 'toko', tokoId, 'anggota'))
+    ]);
+    if (tokoId !== state.tokoId) return;
+    state.toko = tk.exists() ? tk.data() : null;
+    state.undangan = und.docs.map((d) => ({ id: d.id, ...d.data() }));
+    state.cabangAktif = ang.docs.map((d) => ({ id: d.id, ...d.data() })).filter((d) => d.peran === 'CABANG');
+    galatKelola('');
+  } catch (err) {
+    state.toko = null; state.undangan = []; state.cabangAktif = [];
+    galatKelola('Daftar cabang gagal dimuat. Muat ulang halaman.');
+  }
+  renderKelola();
+}
+
+function renderKelola() {
+  const undangan = state.undangan || [], aktif = state.cabangAktif || [];
+  const menunggu = undangan.filter((u) => statusUndangan(u) === 'menunggu');
+  const batas = state.toko && Number.isFinite(state.toko.batasCabang) ? state.toko.batasCabang : null;
+  const terisi = aktif.length + menunggu.length;
+  const mati = !!state.toko && state.toko.aktif === false;
+  const penuh = batas != null && terisi >= batas;
+  $('infoKelola').textContent = batas == null ? '' : terisi + ' dari ' + batas + ' cabang terisi';
+  $('tombolUndang').disabled = mati || penuh;
+  $('catatKelola').textContent = mati ? 'Toko ini dinonaktifkan. Hubungi penjual Nada Pos.'
+    : penuh ? 'Batas cabang tercapai. Batalkan undangan atau cabut akses untuk menambah cabang.' : '';
+  const baris = aktif.map((c) => '<li class="kl"><div><b>' + esc(c.namaCabang || c.kodeDokumen) + '</b><div class="muted small">Kode ' + esc(c.kodeDokumen) + ', sudah bergabung</div></div>'
+    + '<button class="btn" type="button" data-aksi="cabut" data-id="' + esc(c.id) + '">Cabut akses</button></li>');
+  undangan.filter((u) => statusUndangan(u) !== 'terpakai').forEach((u) => {
+    const ok = statusUndangan(u) === 'menunggu';
+    const ket = ok ? 'Menunggu, berlaku sampai ' + tglPendek(u.berlakuSampai.toMillis()) : 'Kedaluwarsa';
+    baris.push('<li class="kl"><div><b>' + esc(u.namaCabang) + '</b><div class="muted small">Kode ' + esc(u.kodeDokumen) + '. ' + ket + '</div></div><div class="aksi">'
+      + (ok ? '<span class="kode">' + esc(u.id) + '</span><button class="btn" type="button" data-aksi="salin" data-id="' + esc(u.id) + '">Salin</button>' : '')
+      + '<button class="btn" type="button" data-aksi="batal" data-id="' + esc(u.id) + '">' + (ok ? 'Batalkan' : 'Hapus') + '</button></div></li>');
+  });
+  $('daftarKelola').innerHTML = baris.join('') || '<li class="muted small" style="padding:12px 0">Belum ada cabang. Buat undangan untuk cabang pertama.</li>';
+}
+
+$('formUndang').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nama = $('kNama').value.trim(), kodeDok = $('kKode').value.trim().toUpperCase().replace(/\s+/g, '');
+  const tombol = $('tombolUndang'), hasil = $('hasilUndangan');
+  tampil(hasil, false); galatKelola('');
+  if (!nama || nama.length > 60) return galatKelola('Isi nama cabang, maksimal 60 karakter.');
+  if (!/^[A-Z0-9_-]{1,30}$/.test(kodeDok)) return galatKelola('Kode cabang hanya boleh huruf, angka, tanda hubung, atau garis bawah, tanpa spasi.');
+  const terpakai = (state.cabangAktif || []).concat((state.undangan || []).filter((u) => statusUndangan(u) === 'menunggu'));
+  if (terpakai.some((x) => x.kodeDokumen === kodeDok)) return galatKelola('Kode cabang ini sudah dipakai. Untuk mengganti HP cabang, cabut akses cabang lama dulu.');
+  tombol.disabled = true;
+  const kode = kodeAcak();
+  try {
+    await setDoc(doc(db, 'undangan', kode), {
+      tokoId: state.tokoId, kodeDokumen: kodeDok, namaCabang: nama,
+      berlakuSampai: Timestamp.fromMillis(Date.now() + 7 * HARI - 3600e3), dibuatPada: serverTimestamp()
+    });
+    $('kNama').value = ''; $('kKode').value = '';
+    hasil.innerHTML = 'Undangan untuk <b>' + esc(nama) + '</b> sudah dibuat: <span class="kode">' + esc(kode) + '</span>'
+      + '<p class="small muted" style="margin-top:8px">Berikan kode ini ke pengelola cabang. Berlaku 7 hari dan hanya bisa dipakai sekali.</p>';
+    tampil(hasil, true);
+    await muatKelola();
+  } catch (err) {
+    galatKelola(err && err.code === 'permission-denied' ? 'Undangan ditolak. Toko mungkin dinonaktifkan atau akun ini bukan pemilik.' : 'Undangan gagal dibuat. Periksa koneksi lalu coba lagi.');
+  } finally {
+    renderKelola();
+  }
+});
+
+$('daftarKelola').addEventListener('click', async (e) => {
+  const t = e.target.closest('button[data-aksi]');
+  if (!t) return;
+  const { aksi, id } = t.dataset;
+  if (aksi === 'salin') {
+    try { await navigator.clipboard.writeText(id); t.textContent = 'Tersalin'; } catch (_) { t.textContent = 'Salin manual'; }
+    return;
+  }
+  const teks = aksi === 'cabut' ? 'Cabut akses cabang ini? HP-nya tidak bisa lagi mengirim rekap.' : 'Batalkan undangan ini?';
+  if (!confirm(teks)) return;
+  t.disabled = true;
+  try {
+    await deleteDoc(aksi === 'cabut' ? doc(db, 'toko', state.tokoId, 'anggota', id) : doc(db, 'undangan', id));
+    await muatKelola();
+  } catch (_) { t.disabled = false; galatKelola('Gagal memproses. Periksa koneksi lalu coba lagi.'); }
 });
 
 /* ---------- filter tanggal ---------- */
