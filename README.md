@@ -19,3 +19,10 @@ Satu file `index.html`, tanpa build. Membaca rekap penjualan dari Firestore proj
 - **Kelola cabang:** muncul di dashboard pemilik toko. Buat undangan (nama cabang + kode cabang), berikan kode 10 karakter ke pengelola cabang (berlaku 7 hari, sekali pakai). Undangan bisa dibatalkan, dan akses cabang yang sudah bergabung bisa dicabut.
 - Jumlah cabang (anggota + undangan menunggu) dibatasi `batasCabang` dari kode aktivasi. Batas ini ditegakkan di tampilan; aturan Firestore menjaga keabsahan kodenya.
 - Admin tambahan (bukan pemilik) tidak melihat Kelola cabang.
+
+## Halaman penjual (`/penjual.html`)
+Halaman kecil khusus pengembang untuk membuat Kode Aktivasi, tanpa perlu membuka Firebase Console tiap ada pelanggan baru. Alamatnya sama dengan dashboard, ditambah `/penjual.html`.
+- Buat kode (10 karakter acak) dengan batas cabang 1 sampai 50 dan catatan opsional (mis. nama pelanggan), lalu salin dan berikan ke pelanggan.
+- Lihat semua kode dengan status Siap dipakai, Terpakai, atau Nonaktif. Kode yang belum dipakai bisa dinonaktifkan, diaktifkan lagi, atau dihapus.
+- **Hanya akun penjual** yang bisa memakainya. Satu kali saja: masuk di halaman ini dengan akun email kamu (buat dulu di Authentication), salin UID yang tampil, lalu di Firestore buat koleksi `penjual` dengan ID dokumen = UID itu dan satu field bebas (mis. `aktif` = true). Aturan Firestore yang menjaga ini, bukan halamannya, jadi akun lain ditolak walau tahu alamat halamannya.
+

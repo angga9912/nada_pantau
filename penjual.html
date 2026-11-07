@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<title>Nada Pantau – Penjual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #EDF1F6; --surface: #FFFFFF; --ink: #0F1B2D; --muted: #566780; --line: #D3DBE6; --soft: #E3E9F2;
+  --brand: #1D4ED8; --brand-ink: #FFFFFF; --ok: #0B8F5F; --warn: #B45309; --bad: #B42318;
+  --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0A111E; --surface: #111B2D; --ink: #E7EDF6; --muted: #9AA9BF; --line: #243249; --soft: #18243A;
+    --brand: #6EA0FF; --brand-ink: #0A111E; --ok: #3DD598; --warn: #F5B454; --bad: #FF8A7A;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--font); }
+h1, h2, p { margin: 0; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; border-radius: 6px; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+.kepala { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0 16px; }
+.kepala h1 { font-size: 20px; font-weight: 800; }
+.blok { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+.blok h2 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.muted { color: var(--muted); } .small { font-size: 13px; }
+label.f { display: block; font-size: 13px; font-weight: 700; margin: 12px 0 4px; }
+.isian { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.btn { padding: 9px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-weight: 700; }
+.btn.utama { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.galat { color: var(--bad); margin-top: 10px; font-size: 14px; }
+.baris { display: grid; grid-template-columns: 110px 1fr auto; gap: 8px; align-items: end; }
+@media (max-width: 560px) { .baris { grid-template-columns: 1fr; } }
+.kode { font: 700 16px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: .08em; padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; background: var(--soft); }
+.hasil { margin-top: 14px; padding: 12px 14px; border: 1px solid var(--ok); border-radius: 8px; }
+.kl { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.kl:last-child { border-bottom: 0; }
+.kl .aksi { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lencana { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; border: 1px solid currentColor; }
+.ok { color: var(--ok); } .warn { color: var(--warn); } .bad { color: var(--bad); }
+ul { list-style: none; margin: 8px 0 0; padding: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kepala">
+    <h1>Penjual Nada Pantau</h1>
+    <div id="akun" hidden><span class="muted small" id="emailAkun"></span> <button class="btn" id="keluar" type="button">Keluar</button></div>
+  </div>
+
+  <section class="blok" id="panelMasuk">
+    <h2>Masuk sebagai penjual</h2>
+    <p class="small muted">Halaman ini khusus pengembang untuk membuat Kode Aktivasi toko. Hanya akun yang terdaftar sebagai penjual yang bisa memakainya.</p>
+    <form id="formMasuk" novalidate>
+      <label class="f" for="email">Email</label>
+      <input class="isian" id="email" type="email" autocomplete="username" inputmode="email">
+      <label class="f" for="sandi">Password</label>
+      <input class="isian" id="sandi" type="password" autocomplete="current-password">
+      <p class="galat" id="galatMasuk" role="alert" hidden></p>
+      <button class="btn utama" id="tombolMasuk" type="submit" style="width:100%;margin-top:16px">Masuk</button>
+    </form>
+  </section>
+
+  <section class="blok" id="panelBukan" hidden>
+    <h2>Akun ini belum terdaftar sebagai penjual</h2>
+    <p class="small muted" style="margin-top:4px">Buat sekali di Firebase Console: Firestore &gt; mulai koleksi <b>penjual</b> &gt; ID dokumen diisi UID di bawah &gt; tambahkan satu field apa saja (mis. <b>aktif</b> = true). Lalu muat ulang halaman ini.</p>
+    <p style="margin-top:10px">UID akun ini: <span class="kode" id="uidAkun"></span> <button class="btn" id="salinUid" type="button">Salin</button></p>
+  </section>
+
+  <div id="panelPenjual" hidden>
+    <section class="blok">
+      <h2>Buat Kode Aktivasi</h2>
+      <p class="small muted">Satu kode untuk satu toko, hanya bisa dipakai sekali. Berikan kodenya ke pelanggan untuk mendaftar di dashboard Nada Pantau.</p>
+      <form id="formKode" novalidate style="margin-top:10px">
+        <div class="baris">
+          <div><label class="f" for="batas" style="margin-top:0">Batas cabang</label>
+            <input class="isian" id="batas" type="number" min="1" max="50" step="1" value="3" inputmode="numeric"></div>
+          <div><label class="f" for="catatan" style="margin-top:0">Catatan (opsional, mis. nama pelanggan)</label>
+            <input class="isian" id="catatan" maxlength="100" autocomplete="off"></div>
+          <button class="btn utama" id="tombolBuat" type="submit">Buat kode</button>
+        </div>
+      </form>
+      <p class="galat" id="galatKode" role="alert" hidden></p>
+      <div class="hasil" id="hasilKode" role="status" hidden></div>
+    </section>
+
+    <section class="blok">
+      <h2>Semua kode <span class="muted small" id="ringkas"></span></h2>
+      <ul id="daftar"></ul>
+    </section>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, doc, getDocs, setDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyCAzpAxVmiixg-ZqnyeGoAvwzN1xhO6dxs",
+  authDomain: "nadapos-4ba51.firebaseapp.com",
+  projectId: "nadapos-4ba51",
+  storageBucket: "nadapos-4ba51.firebasestorage.app",
+  messagingSenderId: "228262249178",
+  appId: "1:228262249178:web:bf94dfb7c5423fee945be3"
+});
+const auth = getAuth(app), db = getFirestore(app);
+const $ = (id) => document.getElementById(id);
+const tampil = (el, ya) => { el.hidden = !ya; };
+const esc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const PESAN = {
+  'auth/invalid-credential': 'Email atau password salah.', 'auth/wrong-password': 'Email atau password salah.',
+  'auth/user-not-found': 'Email atau password salah.', 'auth/invalid-email': 'Format email tidak valid.',
+  'auth/too-many-requests': 'Terlalu banyak percobaan. Tunggu beberapa menit.', 'auth/network-request-failed': 'Tidak ada koneksi internet.'
+};
+
+function kodeAcak() { // 32 karakter tanpa 0/O/1/I; 2^32 habis dibagi 32, jadi tanpa bias
+  const abjad = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', a = new Uint32Array(10);
+  crypto.getRandomValues(a);
+  return Array.from(a, (x) => abjad[x % 32]).join('');
+}
+const tgl = (ts) => ts && ts.toMillis ? new Date(ts.toMillis()).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : 'dibuat manual';
+let kodeList = [];
+
+$('formMasuk').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const g = $('galatMasuk'), t = $('tombolMasuk'); g.hidden = true;
+  t.disabled = true; t.textContent = 'Memeriksa…';
+  try { await signInWithEmailAndPassword(auth, $('email').value.trim(), $('sandi').value); }
+  catch (err) { g.textContent = PESAN[err && err.code] || 'Gagal masuk. Coba lagi.'; g.hidden = false; }
+  finally { t.disabled = false; t.textContent = 'Masuk'; }
+});
+$('keluar').addEventListener('click', () => signOut(auth));
+$('salinUid').addEventListener('click', async (e) => {
+  try { await navigator.clipboard.writeText(auth.currentUser.uid); e.target.textContent = 'Tersalin'; } catch (_) { e.target.textContent = 'Salin manual'; }
+});
+
+onAuthStateChanged(auth, async (user) => {
+  tampil($('akun'), !!user); tampil($('panelMasuk'), !user);
+  tampil($('panelBukan'), false); tampil($('panelPenjual'), false);
+  if (!user) return;
+  $('emailAkun').textContent = user.email || 'akun anonim';
+  $('uidAkun').textContent = user.uid;
+  await muat();
+});
+
+async function muat() {
+  try {
+    const snap = await getDocs(collection(db, 'aktivasi'));
+    kodeList = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (b.dibuatPada ? b.dibuatPada.toMillis() : 0) - (a.dibuatPada ? a.dibuatPada.toMillis() : 0));
+    tampil($('panelPenjual'), true); tampil($('panelBukan'), false);
+    render();
+  } catch (err) {
+    if (err && err.code === 'permission-denied') { tampil($('panelBukan'), true); tampil($('panelPenjual'), false); }
+    else { tampil($('panelPenjual'), true); galatKode('Daftar kode gagal dimuat. Periksa koneksi lalu muat ulang.'); }
+  }
+}
+
+const status = (k) => k.dipakaiOleh ? 'terpakai' : (k.aktif === true ? 'siap' : 'nonaktif');
+function render() {
+  const siap = kodeList.filter((k) => status(k) === 'siap').length;
+  $('ringkas').textContent = '(' + kodeList.length + ' kode, ' + siap + ' siap dipakai)';
+  $('daftar').innerHTML = kodeList.map((k) => {
+    const s = status(k);
+    const lencana = s === 'siap' ? '<span class="lencana ok">Siap dipakai</span>'
+      : s === 'terpakai' ? '<span class="lencana warn">Terpakai</span>' : '<span class="lencana bad">Nonaktif</span>';
+    const ket = 'Batas ' + esc(k.batasCabang) + ' cabang, ' + tgl(k.dibuatPada)
+      + (s === 'terpakai' ? ', akun ' + esc(String(k.dipakaiOleh).slice(0, 6)) + '…' : '');
+    return '<li class="kl"><div><span class="kode">' + esc(k.id) + '</span> ' + lencana
+      + '<div class="muted small" style="margin-top:6px">' + (k.catatan ? esc(k.catatan) + '. ' : '') + ket + '</div></div><div class="aksi">'
+      + (s === 'siap' ? '<button class="btn" type="button" data-aksi="salin" data-id="' + esc(k.id) + '">Salin</button>' : '')
+      + (s !== 'terpakai' ? '<button class="btn" type="button" data-aksi="' + (s === 'siap' ? 'nonaktif' : 'aktif') + '" data-id="' + esc(k.id) + '">' + (s === 'siap' ? 'Nonaktifkan' : 'Aktifkan') + '</button>'
+        + '<button class="btn" type="button" data-aksi="hapus" data-id="' + esc(k.id) + '">Hapus</button>' : '')
+      + '</div></li>';
+  }).join('') || '<li class="muted small" style="padding:12px 0">Belum ada kode. Buat kode pertama di atas.</li>';
+}
+
+function galatKode(t) { const el = $('galatKode'); el.textContent = t || ''; el.hidden = !t; }
+
+$('formKode').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const batas = Number($('batas').value), catatan = $('catatan').value.trim();
+  const tombol = $('tombolBuat'), hasil = $('hasilKode');
+  tampil(hasil, false); galatKode('');
+  if (!Number.isInteger(batas) || batas < 1 || batas > 50) return galatKode('Batas cabang harus bilangan bulat 1 sampai 50.');
+  tombol.disabled = true;
+  const kode = kodeAcak();
+  const data = { aktif: true, batasCabang: batas, dibuatPada: serverTimestamp() };
+  if (catatan) data.catatan = catatan;
+  try {
+    await setDoc(doc(db, 'aktivasi', kode), data);
+    $('catatan').value = '';
+    hasil.innerHTML = 'Kode untuk <b>' + (catatan ? esc(catatan) : 'toko baru') + '</b> (maks. ' + batas + ' cabang): <span class="kode">' + esc(kode) + '</span> '
+      + '<button class="btn" type="button" data-aksi="salin" data-id="' + esc(kode) + '">Salin</button>'
+      + '<p class="small muted" style="margin-top:8px">Berikan ke pelanggan. Hanya bisa dipakai sekali.</p>';
+    tampil(hasil, true);
+    await muat();
+  } catch (err) {
+    galatKode(err && err.code === 'permission-denied' ? 'Ditolak. Pastikan akun ini terdaftar sebagai penjual.' : 'Gagal membuat kode. Periksa koneksi lalu coba lagi.');
+  } finally { tombol.disabled = false; }
+});
+
+document.addEventListener('click', async (e) => {
+  const t = e.target.closest('button[data-aksi]');
+  if (!t) return;
+  const { aksi, id } = t.dataset;
+  if (aksi === 'salin') {
+    try { await navigator.clipboard.writeText(id); t.textContent = 'Tersalin'; } catch (_) { t.textContent = 'Salin manual'; }
+    return;
+  }
+  if (aksi === 'hapus' && !confirm('Hapus kode ' + id + '? Kode ini tidak bisa dipakai mendaftar lagi.')) return;
+  t.disabled = true; galatKode('');
+  try {
+    if (aksi === 'hapus') await deleteDoc(doc(db, 'aktivasi', id));
+    else await updateDoc(doc(db, 'aktivasi', id), { aktif: aksi === 'aktif' });
+    await muat();
+  } catch (_) { t.disabled = false; galatKode('Gagal memproses. Periksa koneksi lalu coba lagi.'); }
+});
+</script>
+</body>
+</html>
